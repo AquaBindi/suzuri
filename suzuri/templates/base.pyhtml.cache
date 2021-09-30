@@ -1,0 +1,14 @@
+timestamp: 1605248134.2654672
+encoding: utf8
+
+_extend=_buf.extend;_to_str=to_str;_escape=escape; _extend(('''<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>''', _escape(_to_str(message)), ''' - susuri Response</title>
+  </head>
+  <body>
+    ''', _to_str(_content), '''
+  </body>
+</html>\n''', ));

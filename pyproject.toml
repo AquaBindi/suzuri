@@ -1,0 +1,45 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "suzuri"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Development Status :: 2 - Pre-Alpha",
+]
+requires-python = ">=3.9"
+dynamic = ['version', 'description']
+dependencies = [
+    "falcon >=2.0.0",
+    "u-msgpack-python==2.6.0",
+    "Beaker==1.11.0",
+    "pymongo==3.10.1",
+]
+
+[[project.authors]]
+name = "Moriyama Toshiharu"
+email = "aqua.bindi@gmail.com"
+
+[project.readme]
+file = "DESCRIPTION"
+content-type = "text/plain"
+
+[project.license]
+file = "LICENSE"
+
+[project.urls]
+Documentation = "https://github.com/AquaBindi/"
+Source = "https://github.com/AquaBindi/suzuri"
+"Bug Tracker" = "https://github.com/AquaBindi/suzuri/issues"
+
+[project.optional-dependencies]
+test = [
+    "pytest >=2.7.3",
+    "pytest-cov",
+]
+doc = ["sphinx"]
+
+[tool.flit.sdist]
+exclude = ["doc/"]
