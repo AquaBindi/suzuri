@@ -55,11 +55,16 @@ def get_wsgi_application():
   logger.info('%s', settings)
   app = create_app()
   for entry in settings.INSTALLED_APPS:
-    urlconf_module = import_module('%s.%s' % (entry, 'urls'))
-    urlpattern = getattr(urlconf_module, 'urlpatterns', urlconf_module)
-
-    for pattern in urlpattern:
-      app.add_route(pattern[0], pattern[1]())  # pylint: disable=no-member
+    try:
+      urlconf_module = import_module('%s.%s' % (entry, 'urls'))
+      urlpatterns = getattr(urlconf_module, 'urlpatterns')
+    except ModuleNotFoundError as err:
+      logger.error(err)
+    except AttributeError:
+      logger.error('Error: Not found urlpatterns in %s.urls', entry)
+    else:
+      for url_path, resource in urlpatterns:
+        app.add_route(url_path, resource())
 
   for route in get_all_routes(app):
     logger.info('%s => %s.%s', route[0], route[1].__module__,
