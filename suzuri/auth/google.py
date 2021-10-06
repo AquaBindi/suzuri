@@ -5,13 +5,11 @@
 import os
 import sys
 import logging
-logger = logging.getLogger('suzuri')
-
 import falcon
-from suzuri.conf import settings
-from apiclient.errors import HttpError
 from google_auth_oauthlib.flow import Flow
-from oauthlib.oauth2.rfc6749.errors import InvalidClientError
+from suzuri.conf import settings
+
+logger = logging.getLogger('suzuri')
 
 def credentials_to_dict(credentials):
   return {'token': credentials.token,
