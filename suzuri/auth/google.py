@@ -5,6 +5,7 @@
 import os
 import sys
 import logging
+import requests
 import falcon
 from google_auth_oauthlib.flow import Flow
 from suzuri.conf import settings
@@ -104,6 +105,12 @@ class AuthResource(object):
     else:
       resp.status = falcon.HTTP_200
       resp.body = doc
+
+def credential_revoke(credentials_dict):
+  requests.post('https://oauth2.googleapis.com/revoke',
+                params = {'token': credentials_dict['token']},
+                headers = {'content-type':
+                           'application/x-www-form-urlencoded'})
 
 urlpattern = [
   ('/auth/{method}', AuthResource),
