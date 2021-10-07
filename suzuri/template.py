@@ -90,12 +90,12 @@ def render(context=None, template=None, layout=':base', cache=None):
 
   paths = get_template_path(frameinfo.filename)
 
-  if not template:
+  if template is None:
     template = ':' + frameinfo.function
 
   preprocessors = get_preprocessors()
 
-  if not cache:
+  if cache is None:
     cache = settings.TEMPLATE_OPTION.get('cache', True)
 
   encoding = settings.TEMPLATE_OPTION.get('encoding', 'utf-8')
