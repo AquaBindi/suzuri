@@ -2,11 +2,13 @@
 DEBUG = True
 LOCALE_PATHS = []
 
-TEMPLATE_OPTION = {
-  'encoding': 'utf8'
+TEMPLATES = {
+  'DIRS': [],
+  'BASE_NAME': 'templates',
+  'CACHE': True,
+  'ENCODING': 'utf8',
+  'CONTEXT_PROCESSORS': []
 }
-
-TEMPLATE_CONTEXT_PROCESSORS = []
 
 STORAGE = {}
 

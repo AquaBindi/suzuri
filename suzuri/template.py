@@ -48,10 +48,10 @@ def get_default_preprocessors():
 
 
 def get_template_path(pathname):
-  paths = string_to_list(settings.TEMPLATE_OPTION.get('template_path', []))
+  paths = string_to_list(settings.TEMPLATES.get('DIRS', []))
   if not paths:
     filepath = Path(pathname)
-    base_name = settings.TEMPLATE_OPTION.get('base_name', 'templates')
+    base_name = settings.TEMPLATES.get('BASE_NAME', 'templates')
     if filepath.is_file():
       path = filepath.parent / base_name
     else:
@@ -63,7 +63,7 @@ def get_template_path(pathname):
 
 
 def get_preprocessors():
-  preprocessors = settings.TEMPLATE_OPTION.get('preprocessors')
+  preprocessors = settings.TEMPLATES.get('PRE_PROCESSORS')
   if preprocessors:
     try:
       result = get_functions(preprocessors)
@@ -77,11 +77,6 @@ def get_preprocessors():
 
 
 def render(context=None, template=None, layout=':base', cache=None):
-  if context:
-    context.update({'debug': False})
-  else:
-    context = {'debug': False}
-
   curframe = inspect.currentframe()
   try:
     frameinfo = inspect.getouterframes(curframe, 2)[1]
@@ -96,9 +91,9 @@ def render(context=None, template=None, layout=':base', cache=None):
   preprocessors = get_preprocessors()
 
   if cache is None:
-    cache = settings.TEMPLATE_OPTION.get('cache', True)
+    cache = settings.TEMPLATES.get('CACHE')
 
-  encoding = settings.TEMPLATE_OPTION.get('encoding', 'utf-8')
+  encoding = settings.TEMPLATES.get('ENCODING', 'utf-8')
   engine = tenjin.Engine(path=paths, postfix='.pyhtml', layout=layout,
                          encoding=encoding, cache=cache, pp=preprocessors,
                          trace=settings.DEBUG)
