@@ -61,7 +61,8 @@ def get_preprocessors():
   return result
 
 
-def render(context=None, template=None, layout=':base', path='templates'):
+def render(context=None, template=None, layout=':base', path='templates',
+           cache=None):
   if context:
     context.update({'debug': False})
   else:
@@ -82,7 +83,9 @@ def render(context=None, template=None, layout=':base', path='templates'):
 
   preprocessors = get_preprocessors()
 
-  cache = settings.TEMPLATE_OPTION.get('cache', True)
+  if not cache:
+    cache = settings.TEMPLATE_OPTION.get('cache', True)
+
   encoding = settings.TEMPLATE_OPTION.get('encoding', 'utf-8')
   engine = tenjin.Engine(path=[path], postfix='.pyhtml', layout=layout,
                          encoding=encoding, cache=cache, pp=preprocessors,

@@ -27,7 +27,7 @@ def handle_404(req, resp):
 
   response = {'message': 'Not found'}
   if resp.content_type == falcon.MEDIA_HTML:
-    resp.body = render(response, ':404')
+    resp.body = render(response, ':404', cache=False)
   elif resp.content_type == falcon.MEDIA_MSGPACK:
     resp.media = response.update({'result': 'failure'})
   elif resp.content_type == falcon.MEDIA_JSON:

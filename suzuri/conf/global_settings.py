@@ -3,7 +3,6 @@ DEBUG = True
 LOCALE_PATHS = []
 
 TEMPLATE_OPTION = {
-  'cache': True,
   'encoding': 'utf8'
 }
 
