@@ -12,15 +12,12 @@ except ImportError:
 logger = logging.getLogger('suzuri')
 
 
-def render(context=None, template=None, layout=None, path='templates'):
+def render(context=None, template=None, layout=':base', path='templates'):
   settings = import_module('suzuri.conf').settings
   if context:
     context.update({'debug': False})
   else:
     context = {'debug': False}
-
-  if layout is None:
-    layout = ':base'
 
   curframe = inspect.currentframe()
   try:
@@ -35,17 +32,15 @@ def render(context=None, template=None, layout=None, path='templates'):
   if not template:
     template = ':' + frameinfo.function
 
-  trace = True
   preprocessors = [tenjin.TemplatePreprocessor()]
   if settings.DEBUG is False:
     preprocessors.append(tenjin.TrimPreprocessor())
-    trace = False
 
   cache = settings.TEMPLATE_OPTION.get('cache', True)
   encoding = settings.TEMPLATE_OPTION.get('encoding', 'utf-8')
   engine = tenjin.Engine(path=[path], postfix='.pyhtml', layout=layout,
                          encoding=encoding, cache=cache, pp=preprocessors,
-                         trace=trace)
+                         trace=settings.DEBUG)
 
   # TODO: settings.TEMPLATE_CONTEXT_PROCESSORS
   context.update({'debug': settings.DEBUG})
