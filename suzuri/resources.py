@@ -52,11 +52,22 @@ class RESTfulResource(BaseResource):
   """
    REpresentational State Transfer ful resouce
   """
+  media = 'json'
+  _content_type = falcon.MEDIA_JSON
+
+  def __init__(self):
+    super().__init__()
+    if self.media == 'msgpack':
+      self._content_type = falcon.MEDIA_MSGPACK
+    elif self.media == 'json':
+      self._content_type = falcon.MEDIA_JSON
+    else:
+      logger.error('Error: Unknown media type %s', self.media)
+
   def _call_method(self, postfix, req, resp, **params):
-    #resp.content_type = falcon.MEDIA_MSGPACK
+    resp.content_type = self._content_type
     resp.status = falcon.HTTP_500
     doc = {'result': 'failure'}
-
     try:
       method = params.get('method')
       attr = getattr(self, method + '_' + postfix)
