@@ -2,7 +2,6 @@
 import os
 import re
 import logging
-from logging import config as logging_config
 from importlib import import_module
 import falcon
 from beaker.middleware import SessionMiddleware
