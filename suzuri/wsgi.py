@@ -54,7 +54,8 @@ def get_wsgi_application():
   settings = import_module('suzuri.conf').settings
   logger.info('%s', settings)
   app = create_app()
-  for entry in settings.INSTALLED_APPS:
+  last_apps = len(settings.INSTALLED_APPS) - 1
+  for i, entry in enumerate(settings.INSTALLED_APPS):
     try:
       urlconf_module = import_module('%s.%s' % (entry, 'urls'))
       urlpatterns = getattr(urlconf_module, 'urlpatterns')
@@ -63,8 +64,12 @@ def get_wsgi_application():
     except AttributeError:
       logger.error('Error: Not found urlpatterns in %s.urls', entry)
     else:
-      for url_path, resource in urlpatterns:
-        app.add_route(url_path, resource())
+      last_pattern = len(urlpatterns) - 1
+      for j, (url_path, resource) in enumerate(urlpatterns):
+        if i == last_apps and j == last_pattern:
+          app.add_route(url_path, resource(), compile=True)
+        else:
+          app.add_route(url_path, resource())
 
   for route in get_all_routes(app):
     logger.info('%s => %s.%s', route[0], route[1].__module__,
