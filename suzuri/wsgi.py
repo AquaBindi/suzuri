@@ -31,7 +31,7 @@ def set_response(req, resp, msg_dict, tpl):
   return resp
 
 
-def handle_404(req, resp):
+def shink_root(req, resp):
   render = import_module('suzuri.template').render
   resp.status = falcon.HTTP_404
   if not req.content_type:
@@ -55,7 +55,7 @@ def handle_404(req, resp):
     resp.body = 'Not found'
 
 
-def error_500(req, resp, ex, params):
+def handle_500(req, resp, ex, params):
   logger.error('%s', ex.__class__.__name__)
   logger.error('%s', ex)
   logger.error('relative: %s', req.relative_uri)
@@ -64,7 +64,7 @@ def error_500(req, resp, ex, params):
   resp.status = falcon.HTTP_500
 
 
-def error_404(req, resp, ex, params):
+def handle_404(req, resp, ex, params):
   logger.error('%s', ex.__class__.__name__)
   logger.error('%s', ex)
   logger.error('relative: %s', req.relative_uri)
@@ -82,9 +82,9 @@ def create_app():
   app.req_options.media_handlers.update(handlers)  # pylint: disable=no-member
   app.resp_options.media_handlers.update(handlers)  # pylint: disable=no-member
 
-  app.add_sink(handle_404, '/')
-  app.add_error_handler(Exception, error_500)
-  app.add_error_handler(falcon.HTTPNotFound, error_404)
+  app.add_sink(shink_root, '/')
+  app.add_error_handler(Exception, handle_500)
+  app.add_error_handler(falcon.HTTPNotFound, handle_404)
 
   return app
 
