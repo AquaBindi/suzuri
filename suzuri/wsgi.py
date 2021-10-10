@@ -11,6 +11,26 @@ from suzuri.utils import get_all_routes
 logger = logging.getLogger('suzuri')
 
 
+def set_response(req, resp, msg_dict, tpl):
+  render = import_module('suzuri.template').render
+  if not req.content_type:
+    resp.content_type = falcon.MEDIA_HTML
+  else:
+    if re.match('text/html.*', req.content_type):
+      resp.content_type = falcon.MEDIA_HTML
+    else:
+      resp.content_type = req.content_type
+
+  if resp.content_type == falcon.MEDIA_MSGPACK or \
+     resp.content_type == falcon.MEDIA_JSON:
+    resp.media = msg_dict
+    resp.media.update({'result': 'failure'})
+  else:
+    resp.body = render(msg_dict, tpl, cache=False)
+
+  return resp
+
+
 def handle_404(req, resp):
   render = import_module('suzuri.template').render
   resp.status = falcon.HTTP_404
@@ -35,6 +55,24 @@ def handle_404(req, resp):
     resp.body = 'Not found'
 
 
+def error_500(req, resp, ex, params):
+  logger.error('%s', ex.__class__.__name__)
+  logger.error('%s', ex)
+  logger.error('relative: %s', req.relative_uri)
+  logger.error('params: %s', params)
+  set_response(req, resp, {'message': 'server error'}, ':500')
+  resp.status = falcon.HTTP_500
+
+
+def error_404(req, resp, ex, params):
+  logger.error('%s', ex.__class__.__name__)
+  logger.error('%s', ex)
+  logger.error('relative: %s', req.relative_uri)
+  logger.error('params: %s', params)
+  set_response(req, resp, {'message': 'not found'}, ':404')
+  resp.status = falcon.HTTP_404
+
+
 def create_app():
   app = falcon.API()
   handlers = falcon.media.Handlers({
@@ -45,6 +83,8 @@ def create_app():
   app.resp_options.media_handlers.update(handlers)  # pylint: disable=no-member
 
   app.add_sink(handle_404, '/')
+  app.add_error_handler(Exception, error_500)
+  app.add_error_handler(falcon.HTTPNotFound, error_404)
 
   return app
 
