@@ -3,7 +3,7 @@
 Suzuri is Web Application framework
 """
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 def get_version():
   return tuple(__version__.split('.'))
