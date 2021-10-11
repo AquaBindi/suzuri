@@ -9,6 +9,7 @@ from suzuri.media import unicode_msgpack_handler, json_handler
 from suzuri.conf import settings
 
 logger = logging.getLogger('suzuri')
+EXCLUDE_EXCEPTIONS = (falcon.HTTPTemporaryRedirect,)
 
 def set_response(req, resp, msg_dict, tpl):
   render = import_module('suzuri.template').render
@@ -55,6 +56,9 @@ def shink_root(req, resp):
 
 
 def handle_500(req, resp, ex, params):
+  if isinstance(ex, EXCLUDE_EXCEPTIONS):
+    raise ex
+
   logger.error('%s', ex.__class__.__name__)
   logger.error('%s', ex)
   logger.error('relative: %s', req.relative_uri)
