@@ -10,4 +10,4 @@ from .umsgpack import UMessagePackHandler
 
 
 json_handler = JSONHandler(dumps=dumps, loads=loads)
-unicode_msgpack_handler = UMessagePackHandler()
+msgpack_handler = UMessagePackHandler()

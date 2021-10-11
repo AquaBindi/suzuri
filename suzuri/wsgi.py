@@ -5,7 +5,7 @@ import logging
 from importlib import import_module
 import falcon
 from beaker.middleware import SessionMiddleware
-from suzuri.media import unicode_msgpack_handler, json_handler
+from suzuri.media import msgpack_handler, json_handler
 from suzuri.conf import settings
 
 logger = logging.getLogger('suzuri')
@@ -79,7 +79,7 @@ def handle_404(req, resp, ex, params):
 def create_app():
   app = falcon.API()
   handlers = falcon.media.Handlers({
-    falcon.MEDIA_MSGPACK: unicode_msgpack_handler,
+    falcon.MEDIA_MSGPACK: msgpack_handler,
     falcon.MEDIA_JSON: json_handler,
   })
   app.req_options.media_handlers.update(handlers)  # pylint: disable=no-member
