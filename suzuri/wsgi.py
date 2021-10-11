@@ -6,10 +6,9 @@ from importlib import import_module
 import falcon
 from beaker.middleware import SessionMiddleware
 from suzuri.media import unicode_msgpack_handler, json_handler
-from suzuri.utils import get_all_routes
+from suzuri.conf import settings
 
 logger = logging.getLogger('suzuri')
-
 
 def set_response(req, resp, msg_dict, tpl):
   render = import_module('suzuri.template').render
@@ -86,13 +85,6 @@ def create_app():
   app.add_error_handler(Exception, handle_500)
   app.add_error_handler(falcon.HTTPNotFound, handle_404)
 
-  return app
-
-
-def get_wsgi_application():
-  settings = import_module('suzuri.conf').settings
-  logger.info('%s', settings)
-  app = create_app()
   last_apps = len(settings.INSTALLED_APPS) - 1
   for i, entry in enumerate(settings.INSTALLED_APPS):
     try:
@@ -105,16 +97,19 @@ def get_wsgi_application():
     else:
       last_pattern = len(urlpatterns) - 1
       for j, (url_path, resource) in enumerate(urlpatterns):
+        logger.info('%s => %s.%s', url_path, resource.__module__,
+                    resource.__class__.__name__)
         if i == last_apps and j == last_pattern:
           app.add_route(url_path, resource(), compile=True)
         else:
           app.add_route(url_path, resource())
 
-  for route in get_all_routes(app):
-    logger.info('%s => %s.%s', route[0], route[1].__module__,
-                route[1].__class__.__name__)
+  return app
 
-  # TODO change my session system
+
+def get_wsgi_application():
+  logger.info('%s', settings)
+  app = create_app()
   app = SessionMiddleware(app, settings.SESSION_OPTS)
 
   if settings.DEBUG:
