@@ -77,7 +77,7 @@ def handle_404(req, resp, ex, params):
 
 
 def create_app():
-  app = falcon.API()
+  app = falcon.App()
   handlers = falcon.media.Handlers({
     falcon.MEDIA_MSGPACK: msgpack_handler,
     falcon.MEDIA_JSON: json_handler,
