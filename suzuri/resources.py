@@ -21,6 +21,8 @@ class BaseResource():
   """
    Base Resource
   """
+  index_method = 'index'
+
   def __init__(self):
     self.storage = None
 
@@ -35,6 +37,12 @@ class BaseResource():
 
   def _call_method(self, postfix, req, resp, **params):
     pass
+
+  def get_attribute(self, method):
+    try:
+      return getattr(self, method)
+    except AttributeError as err:
+      raise falcon.HTTPNotFound(f'Not Found \'{method}\' method') from err
 
   def exception_info(self):
     exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -65,32 +73,17 @@ class RESTfulResource(BaseResource):
       logger.error('Error: Unknown media type %s', self.media)
 
   def _call_method(self, postfix, req, resp, **params):
-    resp.content_type = self._content_type
-    resp.status = falcon.HTTP_500
-    doc = {'result': 'failure'}
-    try:
-      method = params.get('method')
-      attr = getattr(self, method + '_' + postfix)
-      if postfix == 'get':
-        doc = attr(req, req.params)
-      elif postfix == 'post':
-        #body = req.stream.read().decode('utf-8')
-        #params = parse.parse_qs(body)
-        #rdoc = attr(req, params)
-        doc = attr(req, req.media)
-      elif postfix == 'delete':
-        doc = attr(req)
-    except (AttributeError, NameError, ValueError):
-      exc_type, exc_value, _ = sys.exc_info()
-      doc.update({
-        'message': '{0}: {1}'.format(exc_type.__name__, exc_value)
-        })
-      logger.error(doc['message'])
-      resp.media = doc
-      resp.status = falcon.HTTP_200
+    method = params.get('method', self.index_method)
+    attr = self.get_attribute(method + '_' + postfix)
+    if postfix == 'post':
+      resp.media = attr(req, req.media)
+    elif postfix == 'delete':
+      resp.media = attr(req)
     else:
-      resp.media = doc
-      resp.status = falcon.HTTP_200
+      resp.media = attr(req, req.params)
+
+    resp.content_type = self._content_type
+    resp.status = falcon.HTTP_200
 
 
 class HtmlResource(BaseResource):
